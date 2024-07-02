@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.18
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
@@ -33,7 +33,7 @@ To start, we have to define some representation of the disks and the stacks. The
 """
 
 # ╔═╡ 620d6834-a2ba-11ea-150a-2132bb54e4b3
-num_disks = 8
+num_disks = 9
 
 # ╔═╡ 35ada214-a32c-11ea-0da3-d5d494b28467
 md"""(Side note: the number of disks is arbitrary. When testing your function, you may want to set it to 1 or 2 to start.)"""
