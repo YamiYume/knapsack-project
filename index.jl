@@ -157,6 +157,7 @@ begin
 	    replace!(final_df[!, col], missing => 0)
 	end
 	final_df
+	CSV.write(p"./data/final_nutrients.csv", final_df)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
