@@ -19,8 +19,15 @@ function filter_duplicated_by_date(df)
     end
 end
 
+# ╔═╡ c70f5498-42a6-492d-9fa9-831b1a4ccf6d
+function print_debug_info(df, fdc_id, nutrient_id)
+    println("Checking for fdc_id = $fdc_id and nutrient_id = $nutrient_id")
+    println(df[(df.fdc_id .== fdc_id) .& (df.nutrient_id .== nutrient_id), :])
+end
+
 # ╔═╡ 26dffbb7-8892-46ec-838e-ddb05b4fd756
 begin
+
 	# Import all the raw data before processing
 	food_path = p".\data\FoodData_Central_foundation_food_csv_2024-04-18\food.csv"
 	food_nutrient_path =
@@ -28,11 +35,14 @@ begin
 	nutrient_path = p".\data\FoodData_Central_foundation_food_csv_2024-04-18\nutrient.csv"
 	food_df = DataFrame(CSV.File(food_path))
 	food_nutrient_df = DataFrame(CSV.File(food_nutrient_path))
-	nutrient_df = DataFrame(CSV.File(nutrient_path));
+	nutrient_df = DataFrame(CSV.File(nutrient_path))
+	
 	# Keep only food such that it is a foundation food since is where data is most complete and precise
 	food_df = food_df[food_df.data_type .== "foundation_food", :]
+	
 	# Drop data_type info since we using a single category
 	select!(food_df, Not(:data_type))
+
 	# Drop useless data
 	select!(food_df, Not(:food_category_id))
 	select!(food_nutrient_df, Not(:min))
@@ -46,88 +56,113 @@ begin
 	select!(food_nutrient_df, Not(:data_points))
 	select!(nutrient_df, Not(:rank))
 	select!(nutrient_df, Not(:nutrient_nbr))
+
 	# Drop older entries of duplicated foods
 	group_duplicates = groupby(food_df, :description)
 	food_df = vcat([filter_duplicated_by_date(df) for df in group_duplicates]...)
+	
 	# Keep only the food_nutrient_df entries that still have a match in food_df
 	food_nutrient_df = food_nutrient_df[in.(food_nutrient_df.fdc_id, Ref(food_df.fdc_id)), :]
+
 	# Drop nutrients that are recommended to not be used by the USDA
 	filter!(row -> !occursin("DO NOT USE", row.name), nutrient_df)
+
 	# Drop nutrients that have no match on food_nutrient_df
 	nutrient_df = nutrient_df[in.(nutrient_df.id, Ref(food_nutrient_df.nutrient_id)), :]
+
 	# Drop components that are non relevant to the nutritional analysis
 	non_relevant = ("Nitrogen", "Ash", "Specific Gravity", "Water", "Citric acid", "Malic acid", "Oxalic acid", "Pyruvic acid", "Quinic acid", "Ergosterol", "Stigmasterol", "Campesterol", "Brassicasterol", "Beta-sitosterol", "Campestanol", "Beta-sitostanol", "Delta-5-avenasterol", "Phytosterols, other", 
 	"Ergosta-7-enol", " Ergosta-7,22-dienol", " Ergosta-5,7-dienol", "Stigmastadiene", "Delta-7-Stigmastenol", "Daidzin", "Daidzein", "Genistein", "Genistin", "Glycitin")
 	filter!(row -> !(row.name in non_relevant), nutrient_df)
+
 	# Drop total fatty acids by labels
 	filter!(row -> !occursin("NLEA", row.name), nutrient_df)
+
 	# Drop specific forms of saturated fatty acids for keep only the total
 	filter!(row -> !occursin("SFA", row.name), nutrient_df)
+
 	# Drop specific forms of monounsaturated fatty acids for keep only the total
 	filter!(row -> !occursin("MUFA", row.name), nutrient_df)
+
 	# Drop specific forms of polyunsaturated fatty acids for keep only the total
 	filter!(row -> !occursin("PUFA", row.name), nutrient_df)
+
 	# Drop specific forms of Trans-fatty acids for keep only the total
 	filter!(row -> !occursin("TFA", row.name), nutrient_df)
 	unnecesary_trans = ("Fatty acids, total trans-monoenoic", "Fatty acids, total trans-dienoic", "Fatty acids, total trans-polyenoic")
 	filter!(row -> !(row.name in unnecesary_trans), nutrient_df)
+	
 	# Keep only one total fiber measure per food
 	have_fiber = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 1079, :fdc_id])
 	have_AOAC_fiber = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 2033, :fdc_id])
 	have_both_fiber = intersect(have_fiber, have_AOAC_fiber)
-	have_both_fiber_condition(row) = ((row.nutrient_id == 2033) && (row.fdc_id in have_both_fiber)) || !(row.fdc_id in have_both_fiber)
+	have_both_fiber_condition(row) = ((row.nutrient_id == 2033) && (row.fdc_id in have_both_fiber)) || !(row.fdc_id in have_both_fiber) || ((row.nutrient_id != 1079) && (row.nutrient_id != 2033))
 	filter!(row -> have_both_fiber_condition(row), food_nutrient_df)
 	food_nutrient_df[food_nutrient_df.nutrient_id .== 2033, :nutrient_id] .= 1079
 	# Drop specific forms of fiber that are unnecesary
 	unnecesary_fiber = ("High Molecular Weight Dietary Fiber (HMWDF)", "Low Molecular Weight Dietary Fiber (LMWDF)", "Total dietary fiber (AOAC 2011.25)", "Beta-glucan")
 	filter!(row -> !(row.name in unnecesary_fiber), nutrient_df)
+	
 	# Keep only one energy measure per food
 	have_energy_atwater = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 2047, :fdc_id])
 	have_energy = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 1008, :fdc_id])
 	have_both_energy = intersect(have_energy_atwater, have_energy)
-	have_both_energy_condition(row) = ((row.nutrient_id == 2047) && (row.fdc_id in have_both_energy)) || !(row.fdc_id in have_both_energy)
+	have_both_energy_condition(row) = ((row.nutrient_id == 2047) && (row.fdc_id in have_both_energy)) || !(row.fdc_id in have_both_energy) || ((row.nutrient_id != 1008) && (row.nutrient_id != 2047))
 	filter!(row -> have_both_energy_condition(row), food_nutrient_df)
 	food_nutrient_df[food_nutrient_df.nutrient_id .== 2047, :nutrient_id] .= 1008
+	
 	# Drop energy measures not used
 	unnecesary_energy = ("Energy (Atwater Specific Factors)", "Energy (Atwater General Factors)")
 	filter!(row -> !(row.name in unnecesary_energy), nutrient_df)
 	filter!(row -> !(row.id == 1062), nutrient_df)
+
 	# Keep only one carbohydrate messure per food
 	have_carbd = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 1005, :fdc_id])
 	have_carbs = Set(food_nutrient_df[food_nutrient_df.nutrient_id .== 1050, :fdc_id])
 	have_both_carb = intersect(have_carbd, have_carbs)
-	have_both_carb_condition(row) = ((row.nutrient_id == 1050) && (row.fdc_id in have_both_energy)) || !(row.fdc_id in have_both_carb)
+	have_both_carb_condition(row) = ((row.nutrient_id == 1050) && (row.fdc_id in have_both_carb)) || !(row.fdc_id in have_both_carb) || ((row.nutrient_id != 1005) && (row.nutrient_id != 1050))
 	filter!(row -> have_both_carb_condition(row), food_nutrient_df)
 	food_nutrient_df[food_nutrient_df.nutrient_id .== 1005, :nutrient_id] .= 1050
 	nutrient_df[nutrient_df.name .== "Carbohydrate, by summation", :name] .= "Carbohydrate, Total"
+
 	# Drop carbohydrate measure not used
 	filter!(row -> !(row.name == "Carbohydrate, by difference"), nutrient_df)
+
 	# Drop specific forms of choline
 	filter!(row -> !occursin("Choline", row.name) || row.name == "Choline, total", nutrient_df)
+
 	# Drop unnecesary forms of vitamin E
 	filter!(row -> !occursin("Toco", row.name), nutrient_df)
 	nutrient_df[nutrient_df.name .== "Vitamin E (alpha-tocopherol)", :name] .= "Vitamin E"
+
 	# Drop unnecesary forms of vitamin A and carotenoids
 	unnecesary_vita = ("cis-beta-Carotene", "cis-Lycopene", "cis-Lutein/Zeaxanthin", "Carotene, beta", "Carotene, alpha", "Carotene, gamma", "trans-beta-Carotene", "trans-Lycopene", "Retinol", "Lutein", "Lycopene", "Lutein + zeaxanthin", "Cryptoxanthin, beta", "Cryptoxanthin, alpha", "Zeaxanthin", "Phytoene", "Phytofluene")
 	filter!(row -> !(row.name in unnecesary_vita), nutrient_df)
+
 	# Drop unnecesary forms of vitamin D
 	unnecesary_vitd = ("25-hydroxycholecalciferol", "Vitamin D2 (ergocalciferol)", "Vitamin D3 (cholecalciferol)", "Vitamin D4")
 	filter!(row -> !(row.name in unnecesary_vitd), nutrient_df)
 	filter!(row -> !(row.id == 1110), nutrient_df)
+
 	# Drop unnecesary forms of folate
 	unnecesary_folate = ("5-methyl tetrahydrofolate (5-MTHF)", "10-Formyl folic acid (10HCOFA)", "5-Formyltetrahydrofolic acid (5-HCOH4")
 	filter!(row -> !(row.name in unnecesary_folate), nutrient_df)
+
 	# Drop unnecesary forms of sugar and oligosacarids
 	unnecesary_sugar = ("Total Sugars", "Sucrose", "Glucose", "Maltose", "Fructose", "Lactose", "Galactose", "Raffinose", "Stachyose", "Verbascose")
 	filter!(row -> !(row.name in unnecesary_sugar), nutrient_df)
+
 	# Drop unnecesary forms of protein and aminoacids
 	unnecesary_protein = ("Tryptophan", "Threonine", "Isoleucine", "Leucine", "Lysine", "Methionine", "Cystine", "Phenylalanine", "Tyrosine", "Valine", "Arginine", "Histidine", "Alanine", "Aspartic acid", "Glutamic acid", "Glycine", "Proline", "Serine", "Hydroxyproline", "Cysteine", "Ergothioneine", "Glutathione", "Betaine")
 	filter!(row -> !(row.name in unnecesary_protein), nutrient_df)
+
 	# Keep only food_nutrient_df entries that still have a match in nutrient_df
 	food_nutrient_df = food_nutrient_df[in.(food_nutrient_df.nutrient_id, Ref(nutrient_df.id)), :]
+
 	# Sort the data for convenience
 	sort!(food_df, :description)
-	sort!(food_nutrient_df, :fdc_id)
+	sort!(food_nutrient_df, :fdc_id);
+
 end
 
 # ╔═╡ 4ec3acab-86ed-414d-b766-30bc475d46ea
@@ -145,20 +180,42 @@ food_df
 # ╔═╡ 1205cc0a-518c-4ac1-939c-75c9a94b7164
 nutrient_df
 
-# ╔═╡ 137e51e3-6a84-4006-a99f-c3cf5b548412
+# ╔═╡ 9df65e43-866f-40bf-8e08-0db6af495940
 food_nutrient_df
 
 # ╔═╡ a9e9ffd9-5967-41bc-b28a-d820ff19c958
 begin
-	merged_df = leftjoin(food_nutrient_df, nutrient_df, on=:nutrient_id => :id)
-	merged_df = leftjoin(merged_df, food_df, on=:fdc_id)
-	final_df = unstack(merged_df, [:fdc_id, :description], :name, :amount)
-	for col in names(final_df)[2:end]
-	    replace!(final_df[!, col], missing => 0)
-	end
-	final_df
-	CSV.write(p"./data/final_nutrients.csv", final_df)
+    # Merge dataframes
+    merged_df = leftjoin(food_nutrient_df, nutrient_df, on=:nutrient_id => :id)
+    merged_df = leftjoin(merged_df, food_df, on=:fdc_id)
+
+    # Unstack merged dataframe
+    final_df = unstack(merged_df, [:fdc_id, :description], :name, :amount)
+
+    # Replace missing values with 0
+    for col in names(final_df)[3:end]  # Start from the third column
+        replace!(final_df[!, col], missing => 0)
+    end
+
+    # Sort nutrient columns alphabetically
+    nutrient_cols = names(final_df)[3:end]
+    nutrient_cols_sorted = sort(nutrient_cols)
+
+    # Reorder dataframe columns
+    new_cols = [:fdc_id, :description, "Energy", nutrient_cols_sorted...]
+
+    # Convert column names to Symbols
+    new_cols_sym = Symbol.(unique(new_cols))
+
+    # Select and reorder columns in final_df
+    final_df = final_df[:, new_cols_sym]
+
+    # Write final dataframe to CSV
+    CSV.write("./data/final_nutrients.csv", final_df)
 end
+
+# ╔═╡ 1bfd3927-c03d-40aa-ae44-e2529a3a5a96
+final_df
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -492,13 +549,15 @@ version = "5.8.0+1"
 # ╔═╡ Cell order:
 # ╠═1efe8035-b81c-4585-9b16-3e8e4838da3f
 # ╠═fdd82160-411c-403f-ad37-577d48f07542
+# ╠═c70f5498-42a6-492d-9fa9-831b1a4ccf6d
 # ╠═26dffbb7-8892-46ec-838e-ddb05b4fd756
 # ╠═4ec3acab-86ed-414d-b766-30bc475d46ea
 # ╠═970e74f3-2456-4064-863f-4e5476d21811
 # ╠═b4adc167-2150-4bda-a88f-5e3a48eaa682
 # ╠═398c8fbe-8514-46aa-9567-b6e0564e6ea3
 # ╠═1205cc0a-518c-4ac1-939c-75c9a94b7164
-# ╠═137e51e3-6a84-4006-a99f-c3cf5b548412
+# ╠═9df65e43-866f-40bf-8e08-0db6af495940
 # ╠═a9e9ffd9-5967-41bc-b28a-d820ff19c958
+# ╠═1bfd3927-c03d-40aa-ae44-e2529a3a5a96
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
