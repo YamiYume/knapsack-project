@@ -147,8 +147,8 @@ begin
 	# Import all the raw data before processing
 	food_path = p"data/FoodData_Central_foundation_food_csv_2024-04-18/food.csv"
 	food_nutrient_path =
-		p".\data\FoodData_Central_foundation_food_csv_2024-04-18\food_nutrient.csv"
-	nutrient_path = p".\data\FoodData_Central_foundation_food_csv_2024-04-18\nutrient.csv"
+		p"data\FoodData_Central_foundation_food_csv_2024-04-18\food_nutrient.csv"
+	nutrient_path = p"data\FoodData_Central_foundation_food_csv_2024-04-18\nutrient.csv"
 	food_df = DataFrame(CSV.File(food_path))
 	food_nutrient_df = DataFrame(CSV.File(food_nutrient_path))
 	nutrient_df = DataFrame(CSV.File(nutrient_path))
@@ -559,7 +559,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "7ff94ffa1377e973a671fb2e5ee5b5c39e45b114"
 
@@ -672,7 +672,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.Convex]]
 deps = ["AbstractTrees", "BenchmarkTools", "LDLFactorizations", "LinearAlgebra", "MathOptInterface", "OrderedCollections", "SparseArrays", "Test"]
@@ -1066,9 +1066,9 @@ version = "0.7.0"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
-git-tree-sha1 = "ff11acffdb082493657550959d4feb4b6149e73a"
+git-tree-sha1 = "90b4f68892337554d31cdcdbe19e48989f26c7e6"
 uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.4.5"
+version = "1.4.3"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -1219,7 +1219,7 @@ version = "17.4.0+2"
 # ╟─77ec79fc-ecfc-45f7-a971-5334d6295bec
 # ╟─f4973cb6-7d8d-4e4c-8594-aa28ea4db4c9
 # ╟─571340fa-1d50-4ad8-bbc1-d549c4314af2
-# ╟─fb57eed1-ebc1-40a8-893c-aa8c13430704
+# ╠═fb57eed1-ebc1-40a8-893c-aa8c13430704
 # ╟─26b0178f-4b21-45ec-9a14-ec3287c1cd15
 # ╟─2b375ef0-564b-4cbc-8ad5-22085b353871
 # ╟─f8064417-a29e-46da-a724-43aa80428e88
