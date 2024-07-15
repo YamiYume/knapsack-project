@@ -19,6 +19,7 @@ begin
 	using Dates
 	using Convex
 	using GLPK
+	using HTTP
 	
     html"""
     <style>
@@ -143,15 +144,14 @@ end
 
 # ╔═╡ fb57eed1-ebc1-40a8-893c-aa8c13430704
 begin
+	food_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/food.csv"
+	food_nutrient_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/food_nutrient.csv"
+	nutrient_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/nutrient.csv"
 
 	# Import all the raw data before processing
-	food_path = p"data/FoodData_Central_foundation_food_csv_2024-04-18/food.csv"
-	food_nutrient_path =
-		p"data\FoodData_Central_foundation_food_csv_2024-04-18\food_nutrient.csv"
-	nutrient_path = p"data\FoodData_Central_foundation_food_csv_2024-04-18\nutrient.csv"
-	food_df = DataFrame(CSV.File(food_path))
-	food_nutrient_df = DataFrame(CSV.File(food_nutrient_path))
-	nutrient_df = DataFrame(CSV.File(nutrient_path))
+	food_df = DataFrame(CSV.File(HTTP.get(food_url).body))
+	food_nutrient_df = DataFrame(CSV.File(HTTP.get(food_nutrient_url).body))
+	nutrient_df = DataFrame(CSV.File(HTTP.get(nutrient_url).body))
 	
 	# Keep only food such that it is a foundation food since is where data is most complete and precise
 	food_df = food_df[food_df.data_type .== "foundation_food", :]
@@ -538,6 +538,7 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 FilePaths = "8fc22ac5-c921-52a6-82fd-178b2807b824"
 FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
 GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 PlotUtils = "995b91a9-d308-5afd-9ec6-746e21dbc043"
@@ -551,6 +552,7 @@ DataFrames = "~1.6.1"
 FilePaths = "~0.8.3"
 FilePathsBase = "~0.9.21"
 GLPK = "~1.2.1"
+HTTP = "~1.10.8"
 PlotUtils = "~1.4.1"
 PlutoUI = "~0.7.59"
 """
@@ -561,7 +563,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "7ff94ffa1377e973a671fb2e5ee5b5c39e45b114"
+project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
 [[deps.AMD]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse_jll"]
@@ -595,6 +597,11 @@ deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
 git-tree-sha1 = "f1dff6729bc61f4d49e140da1af55dcd1ac97b2f"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 version = "1.5.0"
+
+[[deps.BitFlags]]
+git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
+uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
+version = "0.1.9"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -674,6 +681,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
 
+[[deps.ConcurrentUtilities]]
+deps = ["Serialization", "Sockets"]
+git-tree-sha1 = "6cbbd4d241d7e6579ab354737f4dd95ca43946e1"
+uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
+version = "2.4.1"
+
 [[deps.Convex]]
 deps = ["AbstractTrees", "BenchmarkTools", "LDLFactorizations", "LinearAlgebra", "MathOptInterface", "OrderedCollections", "SparseArrays", "Test"]
 git-tree-sha1 = "aee723f099f0bb8f7543573227fa90ee8cf4a25e"
@@ -734,6 +747,12 @@ deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
 
+[[deps.ExceptionUnwrapping]]
+deps = ["Test"]
+git-tree-sha1 = "dcb08a0d93ec0b1cdc4af184b26b591e9695423a"
+uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
+version = "0.1.10"
+
 [[deps.FilePaths]]
 deps = ["FilePathsBase", "MacroTools", "Reexport", "Requires"]
 git-tree-sha1 = "919d9412dbf53a2e6fe74af62a73ceed0bce0629"
@@ -787,6 +806,12 @@ version = "5.0.1+0"
 deps = ["Artifacts", "Libdl"]
 uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
 version = "6.2.1+6"
+
+[[deps.HTTP]]
+deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
+git-tree-sha1 = "d1d712be3164d61d1fb98e7ce9bcbc6cc06b45ed"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "1.10.8"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
@@ -910,6 +935,12 @@ version = "0.3.28"
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
+[[deps.LoggingExtras]]
+deps = ["Dates", "Logging"]
+git-tree-sha1 = "c1dd6d7978c12545b4179fb6153b9250c96b0075"
+uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+version = "1.0.3"
+
 [[deps.MIMEs]]
 git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
 uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
@@ -930,6 +961,12 @@ deps = ["BenchmarkTools", "CodecBzip2", "CodecZlib", "DataStructures", "ForwardD
 git-tree-sha1 = "91b08d27a27d83cf1e63e50837403e7f53a0fd74"
 uuid = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 version = "1.31.0"
+
+[[deps.MbedTLS]]
+deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
+git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "1.1.9"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -974,6 +1011,18 @@ version = "0.3.23+4"
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 version = "0.8.1+2"
+
+[[deps.OpenSSL]]
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "38cb508d080d21dc1128f7fb04f20387ed4c0af4"
+uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
+version = "1.4.3"
+
+[[deps.OpenSSL_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "a028ee3cb5641cccc4c24e90c36b0a4f7707bdf5"
+uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+version = "3.0.14+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -1072,6 +1121,11 @@ version = "1.4.3"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[[deps.SimpleBufferStream]]
+git-tree-sha1 = "874e8867b33a00e784c8a7e4b60afe9e037b74e1"
+uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
+version = "1.1.0"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
