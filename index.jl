@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.45
 
 using Markdown
 using InteractiveUtils
@@ -91,9 +91,15 @@ Semestre 2024-1
 md"""
 # Introducción
 ## Objetivo del proyecto
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+En este proyecto desarrollamos una herramienta para la planificación de dietas diarias que permitan maximizar la ingesta de nutrientes sin superar un límite de calorías definido. Nuestra prioridad con este proyecto es proveer a los usuario de ayuda extra a la hora de seleccionar alimentos que puedan proporcionar una base sólida para una alimentación diaria equilibrada.
 ## Importancia de la planificación de dietas
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+La planificación de dietas es fundamental para mantener y mejorar la salud en general. Al planificar tus comidas, aseguras una ingesta equilibrada de nutrientes esenciales, lo cual es vital para mantener la energía y el bienestar. Una correcta planificación no solo contribuye a la prevención de enfermedades crónicas como diabetes y las enfermedades cardíacas, sino que también facilita la gestión del peso, ayudando a evitar el exceso de calorías y la ingesta de alimentos poco saludables. Algunas de las ventajas de esta planificación se muestran a continuación:
+
+- Mejor control nutricional: Al planificar, asegurar una ingesta equilibrada de nutrientes esenciales, lo que puede mejorar tu energía y bienestar general.
+- Prevención de enfermedades: Una dieta bien planificada puede reducir el riesgo de enfermedades crónicas como diabetes, hipertensión y enfermedades cardíacas.
+- Gestión del peso: Ayuda a mantener un peso saludable al evitar el exceso de calorías y la ingesta de alimentos poco saludables.
+- Mejora de la digestión: Comer a intervalos regulares y elegir alimentos ricos en fibra puede mejorar tu salud digestiva.
+- Ahorro de tiempo y dinero: Planificar las comidas te ayuda a comprar solo lo necesario, evitando compras impulsivas y desperdicios de alimentos.
 """
 
 # ╔═╡ f2bc6731-abf5-4f94-908c-038e3b1c2c8f
@@ -102,9 +108,28 @@ md"""
 ## Optimización convexa
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
 ## Problema de la mochila binaria
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+El problema de la mochila binaria es un problema de optimización combinatoria que se puede formular de la siguiente manera:
+
+Imagina que tienes una mochila con una capacidad máxima de peso y una serie de objetos, cada uno con un peso y un valor. El objetivo es determinar qué objetos incluir en la mochila para maximizar el valor total sin exceder la capacidad de peso.
+
+Entrando en notación, podríamos pensar los componentes del problema de la siguiente manera. 
+
+- Capacidad mochila -> $C$
+- Peso del objeto i -> $\omega_i$
+- Valor del objeto i -> $p_i$
+
+Entonces el problema se puede pensar en términos de optimización como la maximización de $\sum_{i}p_ix_i$ sujeto a la restricción $\sum_i \omega_ix_i \leq C$, donde $x_i$ toma únicamente el valor de 1 o 0, representando que se toma en cuenta al objeto $i$ o no.
+
+A modo de ejemplo, pensemos en la siguiente situación, supongamos que tienes una mochila que puede cargar hasta 15 kg y tienes los siguientes objetos:
+
+- Objeto 1: Peso = 5 kg, Valor = 10
+- Objeto 2: Peso = 8 kg, Valor = 15
+- Objeto 3: Peso = 3 kg, Valor = 7
+
+El objetivo es seleccionar una combinación de estos objetos que maximice el valor total sin exceder los 15 kg de capacidad. La solución para este caso es sencilla y corresponde a poner en la bolsa los objetos 1 y 2. Sin embargo, a medida que nuestro espacio de búsqueda aumenta, las posibilidades también y el problema empieza a hacerse más complejo, pues el espacio de búsqueda (los subconjuntos de nuestro conjunto de objetos) aumenta de manera exponencial.
+
 ## Aplicación en la planificación de dietas
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+Modelar el problema de la elección de una dieta con el problema del Knapsack binario te permite optimizar la selección de alimentos para maximizar el valor nutritivo dentro de un límite calórico. Esto es especialmente útil para personas que necesitan controlar su ingesta calórica diaria por razones de salud o fitness, asegurándose al mismo tiempo de obtener la mayor cantidad de nutrientes posibles.
 """
 
 # ╔═╡ e558d92c-50f3-4985-a460-d3ac8667cde2
@@ -510,9 +535,22 @@ La diversidad de alimentos seleccionados y el cumplimiento de los límites nutri
 md"""
 # Conclusiones
 ## Resumen de hallazgos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+El problema del saco binario puede ser solucionado mediante el uso del solver GLPK ya que el problema se resume a un problema de programación lineal y programación entera mixta. Este solver utiliza algoritmos como el método $\mathbf{SIMPLEX}$ y el $\mathbf{BRANCH-AND-BOUND}$ para encontrar la solución óptima en un espacio de búsqueda completo (todos los subconjuntos del conjunto de elementos).
+
+Esta forma de resolve el problema no es única pues mediante el uso de la técnica de programación dinámica se puede dar respuesta al problema mediante la descomposición en sub-problemas más pequeños y la resolución de estos de manera recursiva.
+
+Entre estas dos variaciones, tenemos algunas diferencias:
+
+- Programación dinámica: Es más eficiente y predecible en términos de complejidad de tiempo para problemas con un número moderado de objetos y una capacidad de mochila manejable. Es adecuada para problemas donde la capacidad máxima W no es extremadamente grande. La complejidad en tiempo es de $\mathbf{O}(nW)$
+
+- Solver GLPK: La complejidad en tiempo, en el peor de los casos, es de $\mathbf{O}(2^n)$ pero en la práctica, GLPK puede resolver muchos problemas de tamaño razonable de manera eficiente utilizando técnicas avanzadas de optimización. Es más adecuado para problemas grandes y complejos donde la programación dinámica puede no ser factible debido a restricciones de memoria o tiempo.
+
 ## Posibles mejoras y extensiones del proyecto
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+Después del trabajo realizado en este proyecto encontramos algunas posibles mejoras y extensiones para el futuro:
+
+- El proyecto tiene potencial de convertirse en una aplicación web o móvil. Las restricciones pueden ser dadas por el usuario, como los alimentos con los que cuenta y las calorias de estos, así mismo como el límite de calorias que puede consumir. El trabajo desarollado hasta el momento puede ser extendido para poder soportar y dar respuestas a todas estas posibles situaciones.
+
+- A pesar de que el problema del saco binario puede modelar nuestro problema de la elección de dieta adecuada, este no permite que hayan alimentos repetidos a menos que se creen más variables para simular esta repetición. El proyecto puede ser trabajado para generalizar esta situación mediante la integración del problema del saco no-acotado.
 """
 
 # ╔═╡ 50cfeca9-a617-424a-b2ea-44fcd538d918
@@ -1267,8 +1305,8 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╟─7fad7700-b3d6-4ebe-ae58-cf36fe4342ec
 # ╟─9eb4b553-449b-4139-bfe3-951e7fa1b22a
-# ╟─69ad61ad-fbcb-4639-b6a0-cef4919c8e3d
-# ╟─f2bc6731-abf5-4f94-908c-038e3b1c2c8f
+# ╠═69ad61ad-fbcb-4639-b6a0-cef4919c8e3d
+# ╠═f2bc6731-abf5-4f94-908c-038e3b1c2c8f
 # ╟─e558d92c-50f3-4985-a460-d3ac8667cde2
 # ╟─77ec79fc-ecfc-45f7-a971-5334d6295bec
 # ╟─f4973cb6-7d8d-4e4c-8594-aa28ea4db4c9
@@ -1297,7 +1335,7 @@ version = "17.4.0+2"
 # ╟─84d12eee-a8d9-4563-a58e-2b5b22b63b9e
 # ╟─3638c32e-1c63-4c68-ad1e-3d5be01f785f
 # ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
-# ╟─c8fac9d9-db20-4a04-b246-5e185123c149
+# ╠═c8fac9d9-db20-4a04-b246-5e185123c149
 # ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
 # ╟─00000000-0000-0000-0000-000000000001
