@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.45
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
@@ -135,19 +135,92 @@ Modelar el problema de la elección de una dieta con el problema del Knapsack bi
 # ╔═╡ e558d92c-50f3-4985-a460-d3ac8667cde2
 md"""
 # Base de datos de alimentos
+
 ## Fuente de datos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+Los datos utilizados en este proyecto fueron obtenidos de la base de datos del Departamento de Agricultura de los Estados Unidos de América. En particular, para nuestra aplicación se tomaron los datos de alimentos basados en el análisis de la composición de alimentos fundacionales mínimamente procesados.
+
 ## Descripción de la base de datos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
-## Estructura y contenidos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+Si bien la base de datos original es más extensa, en nuestra aplicación se usaron principalmente tres tablas de datos: 
+- `food`: tabla que contiene las descripciones de alimentos.
+- `nutrient`: tabla que contiene la descripción y las unidades de medida de cada nutriente.
+- `food_nutrient`: tabla que contiene entradas de cantidades de un nutriente y el alimento al que corresponde dicha cantidad.
 """
 
 # ╔═╡ 77ec79fc-ecfc-45f7-a971-5334d6295bec
 md"""
-# Preparación de los datos
-## Limpieza y transformación de los datos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+# Preparación de los Datos
+
+## Limpieza y Transformación de los Datos
+
+Durante la limpieza de datos se realizaron los siguientes procesos:
+
+1. **Carga de Datos en Bruto**
+   - Importación de datos en bruto desde archivos CSV ubicados en URLs especificadas.
+
+2. **Filtrar Alimentos Fundacionales**
+   - Mantener solo los alimentos clasificados como "foundation_food" para datos más completos y precisos.
+
+3. **Eliminar Columnas Irrelevantes**
+   - Eliminación de columnas que no eran necesarias para el análisis:
+     - De `food_df`: `data_type`, `food_category_id`.
+     - De `food_nutrient_df`: `min`, `max`, `median`, `footnote`, `loq`, `min_year_acquired`, `id`, `derivation_id`, `data_points`.
+     - De `nutrient_df`: `rank`, `nutrient_nbr`.
+
+4. **Manejo de Duplicados**
+   - Agrupar descripciones de alimentos y mantener la entrada más reciente para alimentos duplicados.
+
+5. **Filtrar Entradas Coincidentes**
+   - Conservar solo las entradas de `food_nutrient_df` que tengan una coincidencia de `fdc_id` en `food_df`.
+
+6. **Excluir Nutrientes No Recomendados**
+   - Eliminar nutrientes marcados como "DO NOT USE" por el USDA.
+
+7. **Filtrar Coincidencias de Nutrientes**
+   - Eliminar nutrientes que no tengan una coincidencia en `food_nutrient_df`.
+
+8. **Eliminar Nutrientes No Relevantes**
+   - Excluir nutrientes considerados no relevantes para el análisis nutricional, incluyendo varios ácidos, esteroles y fitoesteroles.
+
+9. **Filtrar Ácidos Grasos**
+   - Eliminar formas específicas de ácidos grasos (SFA, MUFA, PUFA, TFA) para mantener solo los totales.
+
+10. **Manejo de Fibra**
+    - Asegurar solo una medida total de fibra por alimento y eliminar formas específicas de fibra.
+
+11. **Medidas de Energía**
+    - Mantener solo una medida de energía por alimento y eliminar formas específicas de medidas de energía.
+
+12. **Medidas de Carbohidratos**
+    - Asegurar solo una medida de carbohidratos por alimento y renombrar las medidas relevantes.
+
+13. **Filtrar Formas de Colina**
+    - Mantener solo la medida total de colina.
+
+14. **Filtrar Formas de Vitamina E**
+    - Mantener solo la medida principal de vitamina E y eliminar formas innecesarias.
+
+15. **Filtrar Formas de Vitamina A y Carotenoides**
+    - Eliminar formas específicas de vitamina A y carotenoides.
+
+16. **Filtrar Formas de Vitamina D**
+    - Eliminar formas innecesarias de vitamina D.
+
+17. **Filtrar Formas de Folato**
+    - Eliminar formas específicas de folato.
+
+18. **Filtrar Azúcares y Oligosacáridos**
+    - Eliminar formas específicas de azúcares y oligosacáridos.
+
+19. **Filtrar Proteínas y Aminoácidos**
+    - Eliminar formas específicas de proteínas y aminoácidos.
+
+20. **Coincidencias Finales**
+    - Conservar solo las entradas de `food_nutrient_df` que tengan una coincidencia de `nutrient_id` en `nutrient_df`.
+
+21. **Ordenar Datos**
+    - Ordenar datos alfabéticamente y por ID para facilitar su búsqueda.
+
+A través de estos procesos se logró optimizar la cantidad de nutrientes a limitar, obteniendo así un modelo que represente de manera óptima el valor nutricional de un alimento.
 """
 
 # ╔═╡ f4973cb6-7d8d-4e4c-8594-aa28ea4db4c9
@@ -315,6 +388,11 @@ size(food_nutrient_df)
 # ╔═╡ f8064417-a29e-46da-a724-43aa80428e88
 size(nutrient_df)
 
+# ╔═╡ f6c235a9-c7d2-4de3-8fa1-c36a0f5c33b7
+md"""
+## Visualización de los datos
+"""
+
 # ╔═╡ 1a21a8df-ee98-403d-bffe-11ac16c7031e
 food_df
 
@@ -357,12 +435,6 @@ end
 
 # ╔═╡ 372158ba-546d-469b-8f1e-ebf23d08404a
 final_df
-
-# ╔═╡ f0bdc334-aa27-476e-8799-da2e6c4ac658
-md"""
-## Visualización de los datos
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
-"""
 
 # ╔═╡ 0df52f9a-3f96-42b8-974d-afbb48e9cefd
 md"""
@@ -1315,12 +1387,12 @@ version = "17.4.0+2"
 # ╟─26b0178f-4b21-45ec-9a14-ec3287c1cd15
 # ╟─2b375ef0-564b-4cbc-8ad5-22085b353871
 # ╟─f8064417-a29e-46da-a724-43aa80428e88
+# ╟─f6c235a9-c7d2-4de3-8fa1-c36a0f5c33b7
 # ╠═1a21a8df-ee98-403d-bffe-11ac16c7031e
 # ╟─ff72d23f-68bf-4990-ac40-ea4b62fd05aa
 # ╟─6e92d909-3ad7-44c3-a513-07dbae9147a5
 # ╟─9feefa44-dc47-474d-91ff-8238317145b9
 # ╠═372158ba-546d-469b-8f1e-ebf23d08404a
-# ╟─f0bdc334-aa27-476e-8799-da2e6c4ac658
 # ╟─0df52f9a-3f96-42b8-974d-afbb48e9cefd
 # ╠═f38cf3f3-0cae-4594-9ea1-316ddea13ab1
 # ╟─725e2684-2b74-45cb-8daf-558f55d80328
