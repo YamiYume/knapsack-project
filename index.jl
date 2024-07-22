@@ -507,8 +507,8 @@ funcion_objetivo = sum(proteinas .* x) + sum(vitamina_a .* x) + sum(vitamina_b12
 
 restricciones = [
     sum(calorias .* x) <= 2500,          # Máximo de calorías
-    sum(proteinas .* x) >= 50,           # Mínimo de proteínas
-    sum(carbohidratos .* x) <= 300,      # Máximo de carbohidratos totales
+    sum(proteinas .* x) <= 600,          # Máximo de proteínas
+    sum(carbohidratos .* x) <= 250,      # Máximo de carbohidratos totales
     sum(vitamina_a .* x) >= 900,         # Mínimo de vitamina A
     sum(vitamina_b12 .* x) >= 2.4,       # Mínimo de vitamina B12
     sum(vitamina_b6 .* x) >= 1.3,        # Mínimo de vitamina B6
@@ -521,7 +521,7 @@ restricciones = [
     sum(magnesio .* x) >= 400,           # Mínimo de magnesio
     sum(fosforo .* x) >= 700,            # Mínimo de fósforo
     sum(potasio .* x) >= 4700,           # Mínimo de potasio
-    sum(sodio .* x) <= 3000,             # Máximo de sodio
+    sum(sodio .* x) <= 2000,             # Máximo de sodio
     sum(zinc .* x) >= 11,                # Mínimo de zinc (puede ser 8 para mujeres)
 ]
 
@@ -629,9 +629,25 @@ Después del trabajo realizado en este proyecto encontramos algunas posibles mej
 md"""
 # Referencias
 ## Bibliografía
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+
+- Boyd, S., & Vandenberghe, L. (2004). Convex Optimization. Cambridge University Press. Recuperado de https://web.stanford.edu/~boyd/cvxbook/.
+
+- FoodData Central. (2023). U.S. Department of Agriculture. Recuperado de https://fdc.nal.usda.gov/.
+
+- GeeksforGeeks. (2023). 0/1 Knapsack Problem | DP-10. Recuperado de https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/.
+
+- Convex.jl Documentation. (2023). Convex Optimization for Julia. Recuperado de https://jump.dev/Convex.jl/stable/.
+
 ## Enlaces a recursos adicionales
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+- Convex Optimization by Stephen Boyd: El libro fundamental sobre optimización convexa, disponible gratuitamente en línea. Recuperado de: [Convex Optimization](https://web.stanford.edu/~boyd/cvxbook/).
+
+- FoodData Central: Base de datos proporcionada por el Departamento de Agricultura de los Estados Unidos (USDA), que ofrece información detallada sobre los nutrientes de diversos alimentos. Disponible en: [FoodData Central](https://fdc.nal.usda.gov/).
+
+- GeeksforGeeks: Una guía completa sobre el problema de la mochila binaria 0/1, que incluye una implementación de programación dinámica y ejemplos detallados. Disponible en: [0/1 Knapsack Problem | DP-10](https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/).
+
+- Convex.jl: Documentación oficial del paquete Convex.jl, utilizado para la optimización convexa en el lenguaje de programación Julia. Disponible en: [Convex.jl Documentation](https://jump.dev/Convex.jl/stable/).
+
+
 """
 
 # ╔═╡ 9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
@@ -671,7 +687,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.4"
+julia_version = "1.10.2"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -789,7 +805,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.1.0+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1400,7 +1416,7 @@ version = "17.4.0+2"
 # ╟─8b7b550b-9879-401c-9122-068ac0cc5272
 # ╠═7ac46500-67d3-4950-a324-8ea575640d37
 # ╟─7a521c99-7bcf-4bf4-8401-67de03e98567
-# ╟─7faa148d-ebf1-4cd0-8ad5-52ff8a50d6c7
+# ╠═7faa148d-ebf1-4cd0-8ad5-52ff8a50d6c7
 # ╟─ac388665-512c-4532-84e6-4a63996927da
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
@@ -1408,7 +1424,7 @@ version = "17.4.0+2"
 # ╟─3638c32e-1c63-4c68-ad1e-3d5be01f785f
 # ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
-# ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
+# ╠═50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
