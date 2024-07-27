@@ -245,11 +245,13 @@ begin
 	food_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/food.csv"
 	food_nutrient_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/food_nutrient.csv"
 	nutrient_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/nutrient.csv"
-
+	food_portion_url = "https://raw.githubusercontent.com/YamiYume/knapsack-project/main/data/FoodData_Central_foundation_food_csv_2024-04-18/food_portion.csv"
+	
 	# Import all the raw data before processing
 	food_df = DataFrame(CSV.File(HTTP.get(food_url).body))
 	food_nutrient_df = DataFrame(CSV.File(HTTP.get(food_nutrient_url).body))
 	nutrient_df = DataFrame(CSV.File(HTTP.get(nutrient_url).body))
+	food_portion_df = DataFrame(CSV.File(HTTP.get(food_portion_url).body))
 	
 	# Keep only food such that it is a foundation food since is where data is most complete and precise
 	food_df = food_df[food_df.data_type .== "foundation_food", :]
@@ -270,6 +272,9 @@ begin
 	select!(food_nutrient_df, Not(:data_points))
 	select!(nutrient_df, Not(:rank))
 	select!(nutrient_df, Not(:nutrient_nbr))
+
+	# Keep only useful data from food_portion_df
+	select!(food_portion_df, :fdc_id, :gram_weight)
 
 	# Drop older entries of duplicated foods
 	group_duplicates = groupby(food_df, :description)
@@ -313,6 +318,7 @@ begin
 	have_both_fiber_condition(row) = ((row.nutrient_id == 2033) && (row.fdc_id in have_both_fiber)) || !(row.fdc_id in have_both_fiber) || ((row.nutrient_id != 1079) && (row.nutrient_id != 2033))
 	filter!(row -> have_both_fiber_condition(row), food_nutrient_df)
 	food_nutrient_df[food_nutrient_df.nutrient_id .== 2033, :nutrient_id] .= 1079
+
 	# Drop specific forms of fiber that are unnecesary
 	unnecesary_fiber = ("High Molecular Weight Dietary Fiber (HMWDF)", "Low Molecular Weight Dietary Fiber (LMWDF)", "Total dietary fiber (AOAC 2011.25)", "Beta-glucan")
 	filter!(row -> !(row.name in unnecesary_fiber), nutrient_df)
@@ -373,9 +379,16 @@ begin
 	# Keep only food_nutrient_df entries that still have a match in nutrient_df
 	food_nutrient_df = food_nutrient_df[in.(food_nutrient_df.nutrient_id, Ref(nutrient_df.id)), :]
 
+	# Keep only food_portion_df entries that still have a match in food_df
+	food_portion_df = food_portion_df[in.(food_portion_df.fdc_id, Ref(food_df.fdc_id)), :]
+
+	food_portion_df = combine(groupby(food_portion_df, :fdc_id)) do subdf
+    subdf[findmin(subdf.gram_weight)[2], :]
+end
+
 	# Sort the data for convenience
 	sort!(food_df, :description)
-	sort!(food_nutrient_df, :fdc_id);
+	sort!(food_nutrient_df, :fdc_id);#
 
 end
 
@@ -387,6 +400,9 @@ size(food_nutrient_df)
 
 # ╔═╡ f8064417-a29e-46da-a724-43aa80428e88
 size(nutrient_df)
+
+# ╔═╡ 10f26d71-cf01-4ffa-b4d5-fcd7c3b2c445
+size(food_portion_df)
 
 # ╔═╡ f6c235a9-c7d2-4de3-8fa1-c36a0f5c33b7
 md"""
@@ -402,6 +418,9 @@ nutrient_df
 # ╔═╡ 6e92d909-3ad7-44c3-a513-07dbae9147a5
 food_nutrient_df
 
+# ╔═╡ 1a32a718-95a4-446a-a07f-6af5b6764925
+food_portion_df
+
 # ╔═╡ 9feefa44-dc47-474d-91ff-8238317145b9
 begin
     # Merge dataframes
@@ -416,12 +435,18 @@ begin
         replace!(final_df[!, col], missing => 0)
     end
 
+	final_df = leftjoin(final_df, food_portion_df, on=:fdc_id)
+
+    for col in names(final_df)[3:end]  # Start from the third column
+        replace!(final_df[!, col], missing => 100)
+    end
+
     # Sort nutrient columns alphabetically
     nutrient_cols = names(final_df)[3:end]
     nutrient_cols_sorted = sort(nutrient_cols)
 
     # Reorder dataframe columns
-    new_cols = [:fdc_id, :description, "Energy", nutrient_cols_sorted...]
+    new_cols = [:fdc_id, :description, "Energy", "gram_weight", nutrient_cols_sorted...]
 
     # Convert column names to Symbols
     new_cols_sym = Symbol.(unique(new_cols))
@@ -567,12 +592,13 @@ begin
 println("Alimentos seleccionados para la dieta óptima:")
 for i in 1:n
     if porciones_seleccionadas[i] > 0
-        println("Alimento: ", alimentos_df[i, "description"])
+        println("Alimento: ", alimentos_df[i, "description"], " ", alimentos_df[i, "gram_weight"], " G")
     end
 end
 
 # Mostramos los totales de nutrientes en la dieta
 println("Calorías totales: ", sum(calorias .* porciones_seleccionadas), " KCAL")
+println("Peso total: ", sum(alimentos_df[:, "gram_weight"] .* porciones_seleccionadas), " G")
 println("Proteínas totales: ", sum(proteinas .* porciones_seleccionadas), " G")
 println("Carbohidratos totales: ", sum(carbohidratos .* porciones_seleccionadas), " G")
 println("Grasas totales: ", sum(grasas .* porciones_seleccionadas), " G")
@@ -687,7 +713,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -805,7 +831,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1403,11 +1429,13 @@ version = "17.4.0+2"
 # ╟─26b0178f-4b21-45ec-9a14-ec3287c1cd15
 # ╟─2b375ef0-564b-4cbc-8ad5-22085b353871
 # ╟─f8064417-a29e-46da-a724-43aa80428e88
+# ╟─10f26d71-cf01-4ffa-b4d5-fcd7c3b2c445
 # ╟─f6c235a9-c7d2-4de3-8fa1-c36a0f5c33b7
 # ╠═1a21a8df-ee98-403d-bffe-11ac16c7031e
-# ╟─ff72d23f-68bf-4990-ac40-ea4b62fd05aa
-# ╟─6e92d909-3ad7-44c3-a513-07dbae9147a5
-# ╟─9feefa44-dc47-474d-91ff-8238317145b9
+# ╠═ff72d23f-68bf-4990-ac40-ea4b62fd05aa
+# ╠═6e92d909-3ad7-44c3-a513-07dbae9147a5
+# ╠═1a32a718-95a4-446a-a07f-6af5b6764925
+# ╠═9feefa44-dc47-474d-91ff-8238317145b9
 # ╠═372158ba-546d-469b-8f1e-ebf23d08404a
 # ╟─0df52f9a-3f96-42b8-974d-afbb48e9cefd
 # ╠═f38cf3f3-0cae-4594-9ea1-316ddea13ab1
@@ -1421,7 +1449,7 @@ version = "17.4.0+2"
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
 # ╟─84d12eee-a8d9-4563-a58e-2b5b22b63b9e
-# ╟─3638c32e-1c63-4c68-ad1e-3d5be01f785f
+# ╠═3638c32e-1c63-4c68-ad1e-3d5be01f785f
 # ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
 # ╠═50cfeca9-a617-424a-b2ea-44fcd538d918
