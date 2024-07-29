@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.45
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
@@ -730,9 +730,9 @@ end
 # ╔═╡ c25a02f9-01ae-47b1-b8df-b808aba58207
 md""" 
 ## Dieta óptima generada
-El modelo ha logrado ajustar la ingesta total de calorías a aproximadamente 2500 KCAL, un valor muy cercano al límite establecido, lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. Las proteínas alcanzan un valor total de 641.88 gramos, superando con creces el mínimo requerido, lo que garantiza un adecuado aporte proteico. Los carbohidratos se mantienen por debajo del límite máximo con 298.68 gramos, mientras que las grasas totales suman 228.78 gramos, asegurando una ingesta equilibrada de macronutrientes.
+El modelo ha logrado ajustar la ingesta total de calorías a aproximadamente 2500 KCAL, un valor muy cercano al límite establecido, lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. Las proteínas alcanzan un valor total de 599.02 gramos, superando con creces el mínimo requerido, lo que garantiza un adecuado aporte proteico. Los carbohidratos se mantienen por debajo del límite máximo con 249.37 gramos, mientras que las grasas totales suman 186.20 gramos, asegurando una ingesta equilibrada de macronutrientes.
 
-En cuanto a los micronutrientes, se observan valores sobresalientes, como los 2773.5 microgramos de vitamina A, 976.76 miligramos de vitamina C y 210.69 miligramos de vitamina E, todos los cuales superan ampliamente las necesidades diarias recomendadas. Los minerales también se encuentran en niveles óptimos, con 6479.19 miligramos de calcio, 128.65 miligramos de hierro y 4296.96 miligramos de magnesio. El potasio total asciende a 43007.16 miligramos, lo que asegura una adecuada función muscular y nerviosa, mientras que el sodio se mantiene dentro de los límites con 2908.07 miligramos. Finalmente, el zinc total se encuentra en 85.7 miligramos, cubriendo ampliamente los requerimientos diarios.
+En cuanto a los micronutrientes, se observan valores sobresalientes, como los 2380.06 microgramos de vitamina A, 294.68 miligramos de vitamina C y 120.59 miligramos de vitamina E, todos los cuales superan ampliamente las necesidades diarias recomendadas. Los minerales también se encuentran en niveles óptimos, con 5762.26 miligramos de calcio, 137.6017 miligramos de hierro y 4391.003 miligramos de magnesio. El potasio total asciende a 40179.65 miligramos, lo que asegura una adecuada función muscular y nerviosa, mientras que el sodio se mantiene dentro de los límites con 1718.61 miligramos. Finalmente, el zinc total se encuentra en 81.33 miligramos, cubriendo ampliamente los requerimientos diarios.
 
 La diversidad de alimentos seleccionados y el cumplimiento de los límites nutricionales establecidos reflejan el éxito del modelo en generar una dieta balanceada y saludable.
 """
@@ -829,7 +829,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.4"
+julia_version = "1.10.2"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -947,7 +947,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.1.0+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1565,9 +1565,9 @@ version = "17.4.0+2"
 # ╟─ac388665-512c-4532-84e6-4a63996927da
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
-# ╟─84d12eee-a8d9-4563-a58e-2b5b22b63b9e
+# ╠═84d12eee-a8d9-4563-a58e-2b5b22b63b9e
 # ╠═3638c32e-1c63-4c68-ad1e-3d5be01f785f
-# ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
+# ╠═c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
 # ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
