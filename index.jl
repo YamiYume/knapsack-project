@@ -513,6 +513,7 @@ begin
 	potasio = alimentos_df[:, "Potassium, K"]
 	sodio = alimentos_df[:, "Sodium, Na"]
 	zinc = alimentos_df[:, "Zinc, Zn"]
+	porcion = alimentos_df[:, "gram_weight"]
 end
 
 # ╔═╡ 7a521c99-7bcf-4bf4-8401-67de03e98567
@@ -532,6 +533,7 @@ funcion_objetivo = sum(proteinas .* x) + sum(vitamina_a .* x) + sum(vitamina_b12
 
 restricciones = [
     sum(calorias .* x) <= 2500,          # Máximo de calorías
+	sum(porcion .* x) <= 5000,           # Máximo peso
     sum(proteinas .* x) <= 600,          # Máximo de proteínas
     sum(carbohidratos .* x) <= 250,      # Máximo de carbohidratos totales
     sum(vitamina_a .* x) >= 900,         # Mínimo de vitamina A
@@ -551,6 +553,9 @@ restricciones = [
 ]
 
 end
+
+# ╔═╡ 8806f2c2-3481-4402-9395-04ad31818226
+
 
 # ╔═╡ ac388665-512c-4532-84e6-4a63996927da
 md"""
@@ -598,7 +603,7 @@ end
 
 # Mostramos los totales de nutrientes en la dieta
 println("Calorías totales: ", sum(calorias .* porciones_seleccionadas), " KCAL")
-println("Peso total: ", sum(alimentos_df[:, "gram_weight"] .* porciones_seleccionadas), " G")
+println("Peso total: ", sum(porcion .* porciones_seleccionadas), " G")
 println("Proteínas totales: ", sum(proteinas .* porciones_seleccionadas), " G")
 println("Carbohidratos totales: ", sum(carbohidratos .* porciones_seleccionadas), " G")
 println("Grasas totales: ", sum(grasas .* porciones_seleccionadas), " G")
@@ -713,7 +718,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.4"
+julia_version = "1.10.2"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -831,7 +836,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.1.0+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1445,6 +1450,7 @@ version = "17.4.0+2"
 # ╠═7ac46500-67d3-4950-a324-8ea575640d37
 # ╟─7a521c99-7bcf-4bf4-8401-67de03e98567
 # ╠═7faa148d-ebf1-4cd0-8ad5-52ff8a50d6c7
+# ╠═8806f2c2-3481-4402-9395-04ad31818226
 # ╟─ac388665-512c-4532-84e6-4a63996927da
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
