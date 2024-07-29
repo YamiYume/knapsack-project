@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.45
 
 using Markdown
 using InteractiveUtils
@@ -106,7 +106,7 @@ La planificación de dietas es fundamental para mantener y mejorar la salud en g
 md"""
 # Fundamentos teóricos
 ## Optimización convexa
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla finibus, lectus vitae molestie imperdiet, elit velit porttitor lacus, nec sagittis velit sapien sit amet purus. Morbi fermentum condimentum metus, nec euismod erat bibendum et. Curabitur elementum non turpis et lacinia. Duis ac sapien posuere, congue sem in, aliquet orci. Fusce bibendum sed erat accumsan viverra. Nulla urna sapien, rutrum sollicitudin dignissim a, tristique ut odio. 
+Optimización matemática que se enfoca en problemas donde tanto la función objetivo como las restricciones son convexas. Este tipo de problemas es especialmente importante porque posee propiedades que permiten la aplicación de métodos eficientes y garantizan la obtención de soluciones óptimas globales.
 ## Problema de la mochila binaria
 El problema de la mochila binaria es un problema de optimización combinatoria que se puede formular de la siguiente manera:
 
@@ -127,6 +127,109 @@ A modo de ejemplo, pensemos en la siguiente situación, supongamos que tienes un
 - Objeto 3: Peso = 3 kg, Valor = 7
 
 El objetivo es seleccionar una combinación de estos objetos que maximice el valor total sin exceder los 15 kg de capacidad. La solución para este caso es sencilla y corresponde a poner en la bolsa los objetos 1 y 2. Sin embargo, a medida que nuestro espacio de búsqueda aumenta, las posibilidades también y el problema empieza a hacerse más complejo, pues el espacio de búsqueda (los subconjuntos de nuestro conjunto de objetos) aumenta de manera exponencial.
+
+## GLPK Solver
+El GLPK (GNU Linear Programming Kit) es una herramienta de software para resolver problemas de programación lineal (LP), programación entera (IP) y programación entera mixta (MIP). Dentro de los algoritmos integrados más usados para atacar los distintos problemas de optimización encontramos los siguientes:
+
+1. Método Simplex: El método Simplex es un algoritmo iterativo que se utiliza para resolver problemas de programación lineal. Navega a lo largo de los vértices del poliedro factible para encontrar el óptimo.
+
+2. Método de Puntos Interiores: Es un enfoque alternativo para resolver problemas de programación lineal que se basa en recorrer el interior del poliedro factible en lugar de sus bordes.
+
+3. Branch-and-Bound: Es un algoritmo utilizado para resolver problemas de programación entera. Divide el problema en subproblemas más pequeños y utiliza límites para descartar soluciones no óptimas.
+
+## Adaptación del solver al problema de la mochila binaria
+
+El problema de la mochila binaria es un tipo específico de problema de programación entera ya que todas las variables de decisión son de tipo entero. Para este tipo de problemas, el solver utiliza comunmente el algoritmo $\textbf{Branch-and-Bound}$ para resolver el problema de forma eficiente. Este método explora el espacio de soluciones de manera sistemática dividiendo (branching) el problema en subproblemas más pequeños y utilizando límites (bounding) para descartar subproblemas que no pueden contener la solución óptima. Algunas de las características de este algoritmo son las siguientes:
+
+1. Exactitud: Encuentra la solución óptima garantizada para problemas de programación entera.
+
+2. Eficiencia en la Práctica: Aunque el peor caso puede ser exponencial, en la práctica, la poda de ramas ineficientes reduce significativamente el número de subproblemas que deben explorarse.
+
+3. Flexibilidad: Puede manejar problemas de gran tamaño y complejidad utilizando técnicas avanzadas de poda y heurísticas para mejorar la eficiencia.
+
+Dentro del funcionamiento interno del algoritmo encontramos las siguientes fases:
+
+$\textbf{Descomposición del problema}:$
+
+- Branching (Ramificación): El problema original se divide en subproblemas más pequeños y manejables. Esto se hace seleccionando una variable binaria y creando dos nuevos subproblemas: uno donde la variable toma un valor de 0 y otro donde la variable toma un valor de 1.
+
+- Bounding (Acotación): Para cada subproblema, se calcula un límite superior (en el caso de maximización) de la mejor solución posible que se puede obtener en ese subproblema. Este límite se utiliza para descartar subproblemas que no pueden mejorar la solución actual.
+
+$\textbf{Solución del Problema Relajado}:$
+
+Se resuelve una versión relajada del problema, donde se permite que las variables binarias tomen valores continuos entre 0 y 1. Esto se hace típicamente utilizando técnicas de programación lineal.
+
+$\textbf{Proceso Iterativo}:$
+
+- Exploración: Se elige un subproblema no explorado y se resuelve su versión relajada.
+    
+- Poda: Si la solución del subproblema relajado no mejora el mejor valor actual conocido, o si no es factible, se descarta (poda).
+    
+- Actualización: Si la solución es factible y mejora el mejor valor conocido, se actualiza la solución óptima.
+
+- El proceso se repite hasta que todos los subproblemas han sido explorados o descartados.
+
+A continuación encontramos algunos detalles sobre la implementación usual del algoritmo.
+
+Inicialización:
+
+- Comienza resolviendo el problema relajado, permitiendo que las variables xixi​ sean continuas en el intervalo [0,1][0,1]. Esto proporciona una solución inicial y un límite superior.
+
+Estructura del Árbol:
+
+- Cada nodo en el árbol de búsqueda representa un subproblema con una asignación parcial de valores binarios (0 o 1) a algunas variables. La raíz del árbol es el problema original relajado.
+
+Ramificación:
+
+- Selecciona una variable $x_k$​ que tiene un valor fraccional en la solución relajada. Crea dos nuevos subproblemas, uno con $x_k=0$ y otro con $x_k=1$.
+
+Acotación:
+
+- Calcula el valor de la función objetivo para los nuevos subproblemas relajados.
+Si el valor de un subproblema no mejora el mejor valor conocido, se poda (se descarta ese subproblema).
+
+Actualización y Poda:
+
+- Si se encuentra una solución factible entera que mejora la mejor solución conocida, se actualiza la solución óptima. Subproblemas que no pueden mejorar la solución óptima actual se podan.
+
+## Programación dinámica al problema de la mochila binaria
+
+La programación dinámica es una técnica de optimización que se utiliza para resolver problemas de toma de decisiones que pueden ser descompuestos en subproblemas más pequeños y manejables. Esta técnica es particularmente útil para el problema de la mochila binaria (0-1 Knapsack problem) debido a su estructura recursiva y a la necesidad de evaluar múltiples combinaciones de elementos de manera eficiente.
+
+Estructura Recursiva:
+
+1. La solución del problema puede ser descompuesta en subproblemas más pequeños.
+
+2. Si consideras el $i$-ésimo objeto, tienes dos opciones: incluirlo en la mochila o no incluirlo.
+
+3. La decisión de incluir o no un objeto depende del valor máximo que se puede obtener con los objetos restantes y la capacidad restante de la mochila.
+
+Definición de la Tabla DP:
+
+1. Se utiliza una tabla $dp[i][w]$ donde $i$ es el número de objetos considerados y $w$ es la capacidad actual de la mochila.
+    
+2. Acá $dp[i][w]$ representa el valor máximo que se puede obtener usando los primeros $i$ objetos con una capacidad de mochila $w$.
+
+Relación de Recurrencia:
+
+1. Si no incluyes el $i$-ésimo objeto:
+    $dp[i][w]=dp[i−1][w]$
+    
+2. Si incluyes el $i$-ésimo objeto (y $w_i \leq w$):
+    $dp[i][w]=max⁡(dp[i−1][w],dp[i−1][w−w_i]+v_i)$
+
+Inicialización:
+
+$dp[0][w]=0$
+$dp[0][w]=0$ para todos los $w$ (sin objetos, valor es 0).
+
+Construcción de la Tabla:
+
+Se llena la tabla iterativamente desde $i=1$ hasta $n$ y desde $w=1$ hasta $W$.
+
+Complejidad en tiempo y memoria: $O(nW)$
+
+Vemos que la programación dinámica resuelve cada subproblema una sola vez y almacena los resultados en una tabla, evitando cálculos redundantes. Esta técnica garantiza encontrar la solución óptima al considerar todas las posibles combinaciones de inclusión y exclusión de objetos de una forma sistemática.
 
 ## Aplicación en la planificación de dietas
 Modelar el problema de la elección de una dieta con el problema del Knapsack binario te permite optimizar la selección de alimentos para maximizar el valor nutritivo dentro de un límite calórico. Esto es especialmente útil para personas que necesitan controlar su ingesta calórica diaria por razones de salud o fitness, asegurándose al mismo tiempo de obtener la mayor cantidad de nutrientes posibles.
@@ -644,9 +747,13 @@ Esta forma de resolve el problema no es única pues mediante el uso de la técni
 
 Entre estas dos variaciones, tenemos algunas diferencias:
 
-- Programación dinámica: Es más eficiente y predecible en términos de complejidad de tiempo para problemas con un número moderado de objetos y una capacidad de mochila manejable. Es adecuada para problemas donde la capacidad máxima W no es extremadamente grande. La complejidad en tiempo es de $\mathbf{O}(nW)$
+- Programación dinámica: Es más eficiente y predecible en términos de complejidad de tiempo para problemas con un número moderado de objetos y una capacidad de mochila manejable. Es adecuada para problemas donde la capacidad máxima W no es extremadamente grande. La complejidad en tiempo y memoria es de $\mathbf{O}(nW)$
 
-- Solver GLPK: La complejidad en tiempo, en el peor de los casos, es de $\mathbf{O}(2^n)$ pero en la práctica, GLPK puede resolver muchos problemas de tamaño razonable de manera eficiente utilizando técnicas avanzadas de optimización. Es más adecuado para problemas grandes y complejos donde la programación dinámica puede no ser factible debido a restricciones de memoria o tiempo.
+- Solver GLPK: La complejidad en tiempo, en el peor de los casos, es de $\mathbf{O}(2^n)$ pero en la práctica, GLPK puede resolver muchos problemas de tamaño razonable de manera eficiente utilizando técnicas avanzadas de optimización. Es más adecuado para problemas grandes y complejos donde la programación dinámica puede no ser factible debido a restricciones de memoria o tiempo. Puede ser más eficiente en términos de memoria, ya que no requiere almacenar todas las soluciones parciales.
+
+- En la práctica, el algoritmo Branch-and-Bound es ampliamente utilizado en solvers como GLPK debido a su capacidad para manejar problemas grandes y complejos de manera eficiente. Aunque la programación dinámica es útil para problemas de tamaño moderado, Branch-and-Bound es preferido en aplicaciones industriales y de investigación donde la escalabilidad y la flexibilidad son cruciales.
+
+- El uso del GLPK es más versatil y flexible y esto se puede ver sobre la cantidad de variables sobre las que hacemos restricciones (calorias, peso, proteinas, carbohidratos, etc.) en vez de solo centrarnos en una a como se haría usualmente en una implementación usando programación dinámica.
 
 ## Posibles mejoras y extensiones del proyecto
 Después del trabajo realizado en este proyecto encontramos algunas posibles mejoras y extensiones para el futuro:
@@ -666,6 +773,10 @@ md"""
 - FoodData Central. (2023). U.S. Department of Agriculture. Recuperado de https://fdc.nal.usda.gov/.
 
 - GeeksforGeeks. (2023). 0/1 Knapsack Problem | DP-10. Recuperado de https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/.
+
+- GeekforGeeks. (2023). Introduction to Branch and Bound. Recuperado de https://www.geeksforgeeks.org/introduction-to-branch-and-bound-data-structures-and-algorithms-tutorial/
+
+- GeekforGeeks. (2023). 0/1 Knapsack using Branch and Bound. Recuperado de https://www.geeksforgeeks.org/0-1-knapsack-using-branch-and-bound/
 
 - Convex.jl Documentation. (2023). Convex Optimization for Julia. Recuperado de https://jump.dev/Convex.jl/stable/.
 
@@ -718,7 +829,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -836,7 +947,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1458,7 +1569,7 @@ version = "17.4.0+2"
 # ╠═3638c32e-1c63-4c68-ad1e-3d5be01f785f
 # ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
-# ╠═50cfeca9-a617-424a-b2ea-44fcd538d918
+# ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
