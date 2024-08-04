@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.45
 
 using Markdown
 using InteractiveUtils
@@ -147,50 +147,17 @@ El problema de la mochila binaria es un tipo específico de problema de programa
 
 3. Flexibilidad: Puede manejar problemas de gran tamaño y complejidad utilizando técnicas avanzadas de poda y heurísticas para mejorar la eficiencia.
 
-Dentro del funcionamiento interno del algoritmo encontramos las siguientes fases:
+Podemos utilizar Backtracking para optimizar la solución de Fuerza Bruta.
 
-$\textbf{Descomposición del problema}:$
+![Backtracking](/imgs/knapsack-back.png)
 
-- Branching (Ramificación): El problema original se divide en subproblemas más pequeños y manejables. Esto se hace seleccionando una variable binaria y creando dos nuevos subproblemas: uno donde la variable toma un valor de 0 y otro donde la variable toma un valor de 1.
+La solución basada en el backtracking funciona mejor que la fuerza bruta al ignorar las soluciones no factibles. Podemos hacerlo mejor (que el backtracking) si conocemos un límite en el subárbol de la mejor solución posible enraizado con cada nodo. Si la mejor en el subárbol es peor que la actual, podemos simplemente ignorar este nodo y sus subárboles. Así que calculamos el límite (mejor solución) para cada nodo y comparamos el límite con la mejor solución actual antes de explorar el nodo.
 
-- Bounding (Acotación): Para cada subproblema, se calcula un límite superior (en el caso de maximización) de la mejor solución posible que se puede obtener en ese subproblema. Este límite se utiliza para descartar subproblemas que no pueden mejorar la solución actual.
+![Bounding](/imgs/knapsack-bb.png)
 
-$\textbf{Solución del Problema Relajado}:$
+¿Cómo encontrar el límite para cada nodo para 0/1 Knapsack?
 
-Se resuelve una versión relajada del problema, donde se permite que las variables binarias tomen valores continuos entre 0 y 1. Esto se hace típicamente utilizando técnicas de programación lineal.
-
-$\textbf{Proceso Iterativo}:$
-
-- Exploración: Se elige un subproblema no explorado y se resuelve su versión relajada.
-    
-- Poda: Si la solución del subproblema relajado no mejora el mejor valor actual conocido, o si no es factible, se descarta (poda).
-    
-- Actualización: Si la solución es factible y mejora el mejor valor conocido, se actualiza la solución óptima.
-
-- El proceso se repite hasta que todos los subproblemas han sido explorados o descartados.
-
-A continuación encontramos algunos detalles sobre la implementación usual del algoritmo.
-
-Inicialización:
-
-- Comienza resolviendo el problema relajado, permitiendo que las variables xixi​ sean continuas en el intervalo [0,1][0,1]. Esto proporciona una solución inicial y un límite superior.
-
-Estructura del Árbol:
-
-- Cada nodo en el árbol de búsqueda representa un subproblema con una asignación parcial de valores binarios (0 o 1) a algunas variables. La raíz del árbol es el problema original relajado.
-
-Ramificación:
-
-- Selecciona una variable $x_k$​ que tiene un valor fraccional en la solución relajada. Crea dos nuevos subproblemas, uno con $x_k=0$ y otro con $x_k=1$.
-
-Acotación:
-
-- Calcula el valor de la función objetivo para los nuevos subproblemas relajados.
-Si el valor de un subproblema no mejora el mejor valor conocido, se poda (se descarta ese subproblema).
-
-Actualización y Poda:
-
-- Si se encuentra una solución factible entera que mejora la mejor solución conocida, se actualiza la solución óptima. Subproblemas que no pueden mejorar la solución óptima actual se podan.
+La idea es utilizar el hecho de que el enfoque Greedy proporciona la mejor solución para el problema de la Mochila Fraccionaria. Para comprobar si un nodo en particular puede darnos una solución mejor o no, calculamos la solución óptima (a través del nodo) utilizando el método Greedy. Si la solución calculada por el método Greedy es mayor que la mejor hasta el momento, entonces no podemos obtener una solución mejor a través del nodo.
 
 ## Programación dinámica al problema de la mochila binaria
 
@@ -829,7 +796,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -947,7 +914,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1536,7 +1503,7 @@ version = "17.4.0+2"
 # ╟─7fad7700-b3d6-4ebe-ae58-cf36fe4342ec
 # ╟─9eb4b553-449b-4139-bfe3-951e7fa1b22a
 # ╟─69ad61ad-fbcb-4639-b6a0-cef4919c8e3d
-# ╟─f2bc6731-abf5-4f94-908c-038e3b1c2c8f
+# ╠═f2bc6731-abf5-4f94-908c-038e3b1c2c8f
 # ╟─e558d92c-50f3-4985-a460-d3ac8667cde2
 # ╟─77ec79fc-ecfc-45f7-a971-5334d6295bec
 # ╟─f4973cb6-7d8d-4e4c-8594-aa28ea4db4c9
