@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.45
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
@@ -692,51 +692,55 @@ end
 md"""
 # Resultados y análisis
 ## Visualización de resultados
-Los resultados obtenidos del modelo de optimización proporcionan una lista detallada de los alimentos seleccionados (una porción de cada uno) y los valores totales de los 18 nutrientes clave en la dieta óptima. La selección de alimentos incluye una variedad de verduras, frutas, productos lácteos, carnes, aceites, hongos y legumbres, lo que asegura una dieta balanceada y rica en nutrientes.
-
-La forma de visualización de estos resultados no solo facilita la interpretación y análisis del modelo, sino que también permite identificar áreas de mejora y ajustar las variables y restricciones para futuras optimizaciones. 
+En la siguiente tabla se muestran los resultados obtenidos del modelo de optimización que proporcionan una lista detallada de los alimentos seleccionados, la porción recomendada de cada uno de estos alimentos y la unidad de medida (que en todos los casos es gramos). La selección de alimentos incluye una variedad de verduras, frutas, productos lácteos, carnes, aceites, hongos y legumbres, lo que asegura una dieta balanceada y rica en nutrientes. 
 """
 
 # ╔═╡ 3638c32e-1c63-4c68-ad1e-3d5be01f785f
 begin
 
-# Imprimimos los alimentos seleccionados
-println("Alimentos seleccionados para la dieta óptima:")
+alimentos_seleccionados = []
+porciones_seleccionadas_vector= []
+
 for i in 1:n
     if porciones_seleccionadas[i] > 0
-        println("Alimento: ", alimentos_df[i, "description"], " ", alimentos_df[i, "gram_weight"], " G")
+        push!(alimentos_seleccionados, alimentos_df[i, "description"])
+        push!(porciones_seleccionadas_vector, alimentos_df[i, "gram_weight"])
     end
 end
 
-# Mostramos los totales de nutrientes en la dieta
-println("Calorías totales: ", sum(calorias .* porciones_seleccionadas), " KCAL")
-println("Peso total: ", sum(porcion .* porciones_seleccionadas), " G")
-println("Proteínas totales: ", sum(proteinas .* porciones_seleccionadas), " G")
-println("Carbohidratos totales: ", sum(carbohidratos .* porciones_seleccionadas), " G")
-println("Grasas totales: ", sum(grasas .* porciones_seleccionadas), " G")
-println("Vitamina A total: ", sum(vitamina_a .* porciones_seleccionadas), " UG")
-println("Vitamina B12 total: ", sum(vitamina_b12 .* porciones_seleccionadas), " UG")
-println("Vitamina B6 total: ", sum(vitamina_b6 .* porciones_seleccionadas), " MG")
-println("Vitamina C total: ", sum(vitamina_c .* porciones_seleccionadas), " MG")
-println("Vitamina D total: ", sum(vitamina_d .* porciones_seleccionadas), " IU")
-println("Vitamina E total: ", sum(vitamina_e .* porciones_seleccionadas), " MG")
-println("Vitamina K total: ", sum(vitamina_k .* porciones_seleccionadas), " UG")
-println("Calcio total: ", sum(calcio .* porciones_seleccionadas), " MG")
-println("Hierro total: ", sum(hierro .* porciones_seleccionadas), " MG")
-println("Magnesio total: ", sum(magnesio .* porciones_seleccionadas), " MG")
-println("Fósforo total: ", sum(fosforo .* porciones_seleccionadas), " MG")
-println("Potasio total: ", sum(potasio .* porciones_seleccionadas), " MG")
-println("Sodio total: ", sum(sodio .* porciones_seleccionadas), " MG")
-println("Zinc total: ", sum(zinc .* porciones_seleccionadas), "MG")
+unidades = fill("G", length(alimentos_seleccionados))
+
+df = DataFrame(Alimento = alimentos_seleccionados, Porción = porciones_seleccionadas_vector, Unidad = unidades)
+
+df
+end
+
+# ╔═╡ 14e79d76-296e-4fde-86ed-66fbfdbbbc0d
+md"""
+Ahora mostramos el valor nutricional real de la dieta, es decir, la cantidad total de cada uno de los nutrientes que se están considerando. La visualización de estos resultados en forma de tabla no solo facilita la interpretación y análisis de la dieta generada, sino que también permite identificar áreas de mejora y ajustar las variables y restricciones para futuras optimizaciones. Por ejemplo, si una persona necesitara que su dieta incluyera más proteina que la sugerida en esta dieta, basta con ir a la parte de restricciones y ajustar el mínimo o máximo a las necesidades de esa persona.
+"""
+
+# ╔═╡ 3b3651d3-927b-458f-8ab4-a2bfd0f866be
+begin
+
+nutrientes = ["Calorías totales", "Peso total", "Proteínas totales", "Carbohidratos totales", "Grasas totales", "Vitamina A total", "Vitamina B12 total", "Vitamina B6 total", "Vitamina C total", "Vitamina D total", "Vitamina E total", "Vitamina K total", "Calcio total", "Hierro total", "Magnesio total", "Fósforo total", "Potasio total", "Sodio total", "Zinc total"]
+	
+cantidades = [sum(calorias .* porciones_seleccionadas), sum(porcion .* porciones_seleccionadas), sum(proteinas .* porciones_seleccionadas), sum(carbohidratos .* porciones_seleccionadas), sum(grasas .* porciones_seleccionadas), sum(vitamina_a .* porciones_seleccionadas), sum(vitamina_b12 .* porciones_seleccionadas), sum(vitamina_b6 .* porciones_seleccionadas), sum(vitamina_c .* porciones_seleccionadas), sum(vitamina_d .* porciones_seleccionadas), sum(vitamina_e .* porciones_seleccionadas), sum(vitamina_k .* porciones_seleccionadas), sum(calcio .* porciones_seleccionadas), sum(hierro .* porciones_seleccionadas), sum(magnesio .* porciones_seleccionadas), sum(fosforo .* porciones_seleccionadas), sum(potasio .* porciones_seleccionadas), sum(sodio .* porciones_seleccionadas), sum(zinc .* porciones_seleccionadas)]
+	
+unidades_nutrientes = ["KCAL", "G", "G", "G", "G", "UG", "UG", "MG", "MG", "IU", "MG", "UG", "MG", "MG", "MG", "MG", "MG", "MG", "MG"]
+
+df_d = DataFrame(Nutriente = nutrientes, Cantidad = cantidades, Unidad = unidades_nutrientes)
+
+df_d
 
 end
 
 # ╔═╡ c25a02f9-01ae-47b1-b8df-b808aba58207
 md""" 
 ## Dieta óptima generada
-El modelo ha logrado ajustar la ingesta total de calorías a aproximadamente 2500 KCAL, un valor muy cercano al límite establecido, lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. Las proteínas alcanzan un valor total de 599.02 gramos, superando con creces el mínimo requerido, lo que garantiza un adecuado aporte proteico. Los carbohidratos se mantienen por debajo del límite máximo con 249.37 gramos, mientras que las grasas totales suman 186.20 gramos, asegurando una ingesta equilibrada de macronutrientes.
+El modelo ha logrado ajustar la ingesta total de calorías a 2490.45 KCA y un peso total de 2977.9 GL, valores muy cercanos al límite establecido, lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. Las proteínas alcanzan un valor total de 597.528 gramos, superando con creces el mínimo requerido, lo que garantiza un adecuado aporte proteico. Los carbohidratos se mantienen por debajo del límite máximo con 157.978 gramos, mientras que las grasas totales suman 146.82 gramos, asegurando una ingesta equilibrada de macronutrientes.
 
-En cuanto a los micronutrientes, se observan valores sobresalientes, como los 2380.06 microgramos de vitamina A, 294.68 miligramos de vitamina C y 120.59 miligramos de vitamina E, todos los cuales superan ampliamente las necesidades diarias recomendadas. Los minerales también se encuentran en niveles óptimos, con 5762.26 miligramos de calcio, 137.6017 miligramos de hierro y 4391.003 miligramos de magnesio. El potasio total asciende a 40179.65 miligramos, lo que asegura una adecuada función muscular y nerviosa, mientras que el sodio se mantiene dentro de los límites con 1718.61 miligramos. Finalmente, el zinc total se encuentra en 81.33 miligramos, cubriendo ampliamente los requerimientos diarios.
+En cuanto a los micronutrientes, se observan valores sobresalientes, como los 962.0 microgramos de vitamina A, 137.72 miligramos de vitamina C y 117.3 miligramos de vitamina E, todos los cuales superan ampliamente las necesidades diarias recomendadas. Los minerales también se encuentran en niveles óptimos, con 6860.81 miligramos de calcio, 131.322 miligramos de hierro y 4069.21 miligramos de magnesio. El potasio total asciende a 34316.0 miligramos, lo que asegura una adecuada función muscular y nerviosa, mientras que el sodio se mantiene dentro de los límites con 1961.08 miligramos. Finalmente, el zinc total se encuentra en 81.44 miligramos, cubriendo ampliamente los requerimientos diarios.
 
 La diversidad de alimentos seleccionados y el cumplimiento de los límites nutricionales establecidos reflejan el éxito del modelo en generar una dieta balanceada y saludable.
 """
@@ -837,7 +841,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.4"
+julia_version = "1.10.2"
 manifest_format = "2.0"
 project_hash = "111a865fc59f8030c4da6073a1561c348bf7c155"
 
@@ -955,7 +959,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.1.0+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -1574,7 +1578,9 @@ version = "17.4.0+2"
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
 # ╟─84d12eee-a8d9-4563-a58e-2b5b22b63b9e
-# ╠═3638c32e-1c63-4c68-ad1e-3d5be01f785f
+# ╟─3638c32e-1c63-4c68-ad1e-3d5be01f785f
+# ╟─14e79d76-296e-4fde-86ed-66fbfdbbbc0d
+# ╟─3b3651d3-927b-458f-8ab4-a2bfd0f866be
 # ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
 # ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
