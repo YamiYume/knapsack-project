@@ -108,6 +108,9 @@ md"""
 ## Optimización convexa
 Optimización matemática que se enfoca en problemas donde tanto la función objetivo como las restricciones son convexas. Este tipo de problemas es especialmente importante porque posee propiedades que permiten la aplicación de métodos eficientes y garantizan la obtención de soluciones óptimas globales.
 ## Problema de la mochila binaria
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*EK0RqskGrP_4uADUAkSZDQ.jpeg)
+
 El problema de la mochila binaria es un problema de optimización combinatoria que se puede formular de la siguiente manera:
 
 Imagina que tienes una mochila con una capacidad máxima de peso y una serie de objetos, cada uno con un peso y un valor. El objetivo es determinar qué objetos incluir en la mochila para maximizar el valor total sin exceder la capacidad de peso.
@@ -133,9 +136,13 @@ El GLPK (GNU Linear Programming Kit) es una herramienta de software para resolve
 
 1. Método Simplex: El método Simplex es un algoritmo iterativo que se utiliza para resolver problemas de programación lineal. Navega a lo largo de los vértices del poliedro factible para encontrar el óptimo.
 
+![](https://www.plandemejora.com/wp-content/uploads/Poliedro.png)
+
 2. Método de Puntos Interiores: Es un enfoque alternativo para resolver problemas de programación lineal que se basa en recorrer el interior del poliedro factible en lugar de sus bordes.
 
 3. Branch-and-Bound: Es un algoritmo utilizado para resolver problemas de programación entera. Divide el problema en subproblemas más pequeños y utiliza límites para descartar soluciones no óptimas.
+
+![](https://www.researchgate.net/publication/281015427/figure/fig1/AS:852627285897218@1580293594101/Illustration-of-the-sequential-branch-and-bound-algorithm.png)
 
 ## Adaptación del solver al problema de la mochila binaria
 
@@ -149,11 +156,11 @@ El problema de la mochila binaria es un tipo específico de problema de programa
 
 Podemos utilizar Backtracking para optimizar la solución de Fuerza Bruta.
 
-![Backtracking](/imgs/knapsack-back.png)
+![Backtracking](https://media.geeksforgeeks.org/wp-content/uploads/20231016145448/0-1-Knapsack-using-Branch-and-Bound.jpg)
 
 La solución basada en el backtracking funciona mejor que la fuerza bruta al ignorar las soluciones no factibles. Podemos hacerlo mejor (que el backtracking) si conocemos un límite en el subárbol de la mejor solución posible enraizado con cada nodo. Si la mejor en el subárbol es peor que la actual, podemos simplemente ignorar este nodo y sus subárboles. Así que calculamos el límite (mejor solución) para cada nodo y comparamos el límite con la mejor solución actual antes de explorar el nodo.
 
-![Bounding](/imgs/knapsack-bb.png)
+![Bounding](https://media.geeksforgeeks.org/wp-content/uploads/20231016145447/0-1-Knapsack-using-Branch-and-Bound3.jpg)
 
 ¿Cómo encontrar el límite para cada nodo para 0/1 Knapsack?
 
@@ -162,6 +169,8 @@ La idea es utilizar el hecho de que el enfoque Greedy proporciona la mejor soluc
 ## Programación dinámica al problema de la mochila binaria
 
 La programación dinámica es una técnica de optimización que se utiliza para resolver problemas de toma de decisiones que pueden ser descompuestos en subproblemas más pequeños y manejables. Esta técnica es particularmente útil para el problema de la mochila binaria (0-1 Knapsack problem) debido a su estructura recursiva y a la necesidad de evaluar múltiples combinaciones de elementos de manera eficiente.
+
+![Tabla de recursión](https://i.ytimg.com/vi/MtxlPXms0fQ/maxresdefault.jpg)
 
 Estructura Recursiva:
 
@@ -1503,7 +1512,7 @@ version = "17.4.0+2"
 # ╟─7fad7700-b3d6-4ebe-ae58-cf36fe4342ec
 # ╟─9eb4b553-449b-4139-bfe3-951e7fa1b22a
 # ╟─69ad61ad-fbcb-4639-b6a0-cef4919c8e3d
-# ╠═f2bc6731-abf5-4f94-908c-038e3b1c2c8f
+# ╟─f2bc6731-abf5-4f94-908c-038e3b1c2c8f
 # ╟─e558d92c-50f3-4985-a460-d3ac8667cde2
 # ╟─77ec79fc-ecfc-45f7-a971-5334d6295bec
 # ╟─f4973cb6-7d8d-4e4c-8594-aa28ea4db4c9
@@ -1532,9 +1541,9 @@ version = "17.4.0+2"
 # ╟─ac388665-512c-4532-84e6-4a63996927da
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
-# ╠═84d12eee-a8d9-4563-a58e-2b5b22b63b9e
+# ╟─84d12eee-a8d9-4563-a58e-2b5b22b63b9e
 # ╠═3638c32e-1c63-4c68-ad1e-3d5be01f785f
-# ╠═c25a02f9-01ae-47b1-b8df-b808aba58207
+# ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
 # ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
