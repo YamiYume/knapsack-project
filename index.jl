@@ -132,17 +132,45 @@ A modo de ejemplo, pensemos en la siguiente situación, supongamos que tienes un
 El objetivo es seleccionar una combinación de estos objetos que maximice el valor total sin exceder los 15 kg de capacidad. La solución para este caso es sencilla y corresponde a poner en la bolsa los objetos 1 y 2. Sin embargo, a medida que nuestro espacio de búsqueda aumenta, las posibilidades también y el problema empieza a hacerse más complejo, pues el espacio de búsqueda (los subconjuntos de nuestro conjunto de objetos) aumenta de manera exponencial.
 
 ## GLPK Solver
-El GLPK (GNU Linear Programming Kit) es una herramienta de software para resolver problemas de programación lineal (LP), programación entera (IP) y programación entera mixta (MIP). Dentro de los algoritmos integrados más usados para atacar los distintos problemas de optimización encontramos los siguientes:
+El GLPK (GNU Linear Programming Kit) es una herramienta de software para resolver problemas de programación lineal (LP), programación entera (IP) y programación entera mixta (MIP). Algunas de las características más importantes del GLPK son las siguientes:
 
-1. Método Simplex: El método Simplex es un algoritmo iterativo que se utiliza para resolver problemas de programación lineal. Navega a lo largo de los vértices del poliedro factible para encontrar el óptimo.
+1. Soporte para LP y MIP: GLPK puede resolver problemas de programación lineal y de programación entera mixta, lo que permite manejar variables continuas y enteras.
+
+2. Formato de entrada: Los problemas se pueden definir utilizando el lenguaje de modelado MathProg, similar a AMPL.
+
+3. Licencia: Es software libre, distribuido bajo la Licencia Pública General de GNU (GPL).
+
+4. Interfaz de programación: GLPK se puede utilizar a través de su interfaz de línea de comandos o mediante una API en lenguajes como C, C++ y Python.
+
+Para usar el solver se requiere una formulación clara del problema. En este paso, el problema de optimización se formula matemáticamente en términos de una función objetivo y un conjunto de restricciones. Para problemas de LP, la función objetivo es una función lineal de las variables de decisión, y las restricciones también son lineales. En MIP, algunas variables de decisión pueden ser restringidas a tomar valores enteros.
+
+En cuanto a los métodos de solución, estos dependen de la naturaleza del problema.
+
+1. Problemas de Programación Lineal (LP):
+
+- Método Simplex: El método Simplex es un algoritmo iterativo que se utiliza para resolver problemas de programación lineal. Navega a lo largo de los vértices del poliedro factible para encontrar el óptimo.
 
 ![](https://www.plandemejora.com/wp-content/uploads/Poliedro.png)
 
-2. Método de Puntos Interiores: Es un enfoque alternativo para resolver problemas de programación lineal que se basa en recorrer el interior del poliedro factible en lugar de sus bordes.
+- Método de Puntos Interiores: Es un enfoque alternativo para resolver problemas de programación lineal que se basa en recorrer el interior del poliedro factible en lugar de sus bordes.
 
-3. Branch-and-Bound: Es un algoritmo utilizado para resolver problemas de programación entera. Divide el problema en subproblemas más pequeños y utiliza límites para descartar soluciones no óptimas.
+2. Problemas de Programación Entera Mixta (MIP):
+
+- Branch-and-Bound: Es un algoritmo utilizado para resolver problemas de programación entera. Divide el problema en subproblemas más pequeños y utiliza límites para descartar soluciones no óptimas.
 
 ![](https://www.researchgate.net/publication/281015427/figure/fig1/AS:852627285897218@1580293594101/Illustration-of-the-sequential-branch-and-bound-algorithm.png)
+
+- Branch-and-Cut: Una extensión del método Branch-and-Bound que agrega cortes (restricciones adicionales) para eliminar soluciones fraccionales no deseadas, mejorando la eficiencia del proceso.
+
+Finalmente, en cuanto a los factores de escalabilidad y rendimiento, internamente el GLPK tiene en cuenta las siguientes consideraciones:
+
+- Preprocesamiento: Simplificación y reformulación de las restricciones y la función objetivo para reducir la complejidad del problema antes de aplicar el solver.
+
+- Tolerancias y Criterios de Parada: Definición de criterios para detener el algoritmo, como el grado de precisión deseado en la solución, el tiempo máximo de computación, o el número máximo de iteraciones.
+
+- Paralelización: En algunos casos, los cálculos pueden ser paralelizados para aprovechar arquitecturas de hardware modernas, acelerando la resolución del problema.
+
+Estos procesos combinados permiten a GLPK encontrar soluciones óptimas o subóptimas eficientes para problemas de optimización lineal y entera mixta, abarcando una amplia gama de aplicaciones en logística, finanzas, producción y otras áreas (como por ejemplo en nuestro caso, nutrición y dietética)
 
 ## Adaptación del solver al problema de la mochila binaria
 
@@ -737,6 +765,10 @@ Después del trabajo realizado en este proyecto encontramos algunas posibles mej
 - El proyecto tiene potencial de convertirse en una aplicación web o móvil. Las restricciones pueden ser dadas por el usuario, como los alimentos con los que cuenta y las calorias de estos, así mismo como el límite de calorias que puede consumir. El trabajo desarollado hasta el momento puede ser extendido para poder soportar y dar respuestas a todas estas posibles situaciones.
 
 - A pesar de que el problema del saco binario puede modelar nuestro problema de la elección de dieta adecuada, este no permite que hayan alimentos repetidos a menos que se creen más variables para simular esta repetición. El proyecto puede ser trabajado para generalizar esta situación mediante la integración del problema del saco no-acotado.
+
+- Incorporar incertidumbre en la disponibilidad de alimentos o en la respuesta del usuario a ciertos alimentos, utilizando modelos probabilísticos. Esto puede ayudar a desarrollar recomendaciones dietéticas más flexibles y adaptativas.
+
+- Realizar análisis de sensibilidad para entender cómo los cambios en las entradas (como la disponibilidad de alimentos o las necesidades calóricas) afectan la solución óptima. Esto puede ser útil para ajustar dinámicamente las recomendaciones en respuesta a cambios en las circunstancias del usuario.
 """
 
 # ╔═╡ 50cfeca9-a617-424a-b2ea-44fcd538d918
