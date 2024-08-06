@@ -4,6 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
 # ╔═╡ 7fad7700-b3d6-4ebe-ae58-cf36fe4342ec
 begin
 
@@ -629,18 +639,40 @@ md"""
 En este punto, definimos la función objetivo, es decir, la que el solver va a maximizar. Excluimos las calorías y los carbohidratos de esta función, ya que, aunque son esenciales para la dieta, no son los elementos que deseamos maximizar directamente. Las calorías y los carbohidratos se han establecido en el paso anterior para controlar su cantidad total en la dieta optimizada, y para al final conocer cuanta es la ingesta de estos nutrientes.
 """
 
+# ╔═╡ 48312602-1d87-4c96-ab2a-beb6fece3112
+@bind nutrientes_función MultiCheckBox(["Proteinas", "Grasas", "Carbohidratos", "Vitamina A", "Vitamina B12", "Vitamina B6", "Vitamina C", " Vitamina D", "Vitamina E", "Vitamina K", "Calcio", "Hierro", "Magnesio", "Fostoro", "Potasio", "Sodio", "Zinc"])
+
+# ╔═╡ 198e341d-92fe-48c7-83ad-558e72342d1b
+nutrientes_función
+
 # ╔═╡ 7faa148d-ebf1-4cd0-8ad5-52ff8a50d6c7
 begin
 
-funcion_objetivo = sum(proteinas .* x) + sum(vitamina_a .* x) + sum(vitamina_b12 .* x) + sum(vitamina_b6 .* x) + sum(vitamina_c .* x) + 
-                   sum(vitamina_d .* x) + sum(vitamina_e .* x) + sum(vitamina_k .* x) + sum(calcio .* x) + sum(hierro .* x) + 
-                   sum(magnesio .* x) + sum(fosforo .* x) + sum(potasio .* x) + 
-                   sum(zinc .* x)
+nutrientes_dicc = Dict(
+    "Proteinas" => proteinas,
+	"Grasas" => grasas,
+    "Vitamina A" => vitamina_a,
+    "Vitamina B12" => vitamina_b12,
+    "Vitamina B6" => vitamina_b6,
+    "Vitamina C" => vitamina_c,
+    "Vitamina D" => vitamina_d,
+    "Vitamina E" => vitamina_e,
+    "Vitamina K" => vitamina_k,
+    "Calcio" => calcio,
+    "Hierro" => hierro,
+    "Magnesio" => magnesio,
+    "Fosforo" => fosforo,
+    "Potasio" => potasio,
+    "Zinc" => zinc
+)
+	
+# Filtrar nutrientes seleccionados y calcular la función objetivo
+funcion_objetivo = sum(sum(nutrientes_dicc[nutriente] .* x) for nutriente in nutrientes_función)
 
 
 restricciones = [
     sum(calorias .* x) <= 2500,          # Máximo de calorías
-	sum(porcion .* x) <= 5000,           # Máximo peso
+	sum(porcion .* x) <= 3000,           # Máximo peso
     sum(proteinas .* x) <= 600,          # Máximo de proteínas
     sum(carbohidratos .* x) <= 250,      # Máximo de carbohidratos totales
     sum(vitamina_a .* x) >= 900,         # Mínimo de vitamina A
@@ -651,18 +683,15 @@ restricciones = [
     sum(vitamina_e .* x) >= 100,         # Mínimo de vitamina E
     sum(vitamina_k .* x) >= 1,           # Mínimo de vitamina K
     sum(calcio .* x) >= 1000,            # Mínimo de calcio
-    sum(hierro .* x) >= 8,               # Mínimo de hierro (puede ser 18 para mujeres)
+    sum(hierro .* x) >= 8,               # Mínimo de hierro
     sum(magnesio .* x) >= 400,           # Mínimo de magnesio
     sum(fosforo .* x) >= 700,            # Mínimo de fósforo
     sum(potasio .* x) >= 4700,           # Mínimo de potasio
     sum(sodio .* x) <= 2000,             # Máximo de sodio
-    sum(zinc .* x) >= 11,                # Mínimo de zinc (puede ser 8 para mujeres)
+    sum(zinc .* x) >= 11,                # Mínimo de zinc
 ]
 
 end
-
-# ╔═╡ 8806f2c2-3481-4402-9395-04ad31818226
-
 
 # ╔═╡ ac388665-512c-4532-84e6-4a63996927da
 md"""
@@ -672,9 +701,7 @@ Con los 18 nutrientes y la función objetivo ya definidos, establecimos las rest
 # ╔═╡ d4c87336-138a-497f-9c91-e7cc13621782
 md"""
 ## Solver utilizado
-Utilizamos el solver GLPK (GNU Linear Programming Kit) junto con el paquete Convex.jl para resolver el problema de optimización de dietas. GLPK es un conjunto de rutinas escritas en C diseñadas para resolver problemas lineales y de programación entera mixta. Es ampliamente reconocido por su eficiencia y capacidad para manejar problemas grandes y complejos.
-
-En este contexto, GLPK se utiliza para maximizar la función objetivo que considera la ingesta de diversos nutrientes mientras se cumplen las restricciones dietéticas. El solver trabaja iterativamente, ajustando las variables binarias que representan la selección de alimentos $x$ hasta encontrar la combinación óptima que maximiza los nutrientes deseados dentro de los límites calóricos y de otros nutrientes establecidos. 
+Utilizamos el solver GLPK (GNU Linear Programming Kit) junto con el paquete Convex.jl para resolver el problema de optimización de dietas. 
 """
 
 # ╔═╡ aafda15f-848f-42d5-8981-635292edb90b
@@ -691,7 +718,7 @@ end
 # ╔═╡ 84d12eee-a8d9-4563-a58e-2b5b22b63b9e
 md"""
 # Resultados y análisis
-## Visualización de resultados
+## Dieta generada y visualización de resultados
 En la siguiente tabla se muestran los resultados obtenidos del modelo de optimización que proporcionan una lista detallada de los alimentos seleccionados, la porción recomendada de cada uno de estos alimentos y la unidad de medida (que en todos los casos es gramos). La selección de alimentos incluye una variedad de verduras, frutas, productos lácteos, carnes, aceites, hongos y legumbres, lo que asegura una dieta balanceada y rica en nutrientes. 
 """
 
@@ -735,14 +762,9 @@ df_d
 
 end
 
-# ╔═╡ c25a02f9-01ae-47b1-b8df-b808aba58207
+# ╔═╡ a2f6a807-a9b0-4b8d-9bf8-d379fc528c45
 md""" 
-## Dieta óptima generada
-El modelo ha logrado ajustar la ingesta total de calorías a 2490.45 KCA y un peso total de 2977.9 GL, valores muy cercanos al límite establecido, lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. Las proteínas alcanzan un valor total de 597.528 gramos, superando con creces el mínimo requerido, lo que garantiza un adecuado aporte proteico. Los carbohidratos se mantienen por debajo del límite máximo con 157.978 gramos, mientras que las grasas totales suman 146.82 gramos, asegurando una ingesta equilibrada de macronutrientes.
-
-En cuanto a los micronutrientes, se observan valores sobresalientes, como los 962.0 microgramos de vitamina A, 137.72 miligramos de vitamina C y 117.3 miligramos de vitamina E, todos los cuales superan ampliamente las necesidades diarias recomendadas. Los minerales también se encuentran en niveles óptimos, con 6860.81 miligramos de calcio, 131.322 miligramos de hierro y 4069.21 miligramos de magnesio. El potasio total asciende a 34316.0 miligramos, lo que asegura una adecuada función muscular y nerviosa, mientras que el sodio se mantiene dentro de los límites con 1961.08 miligramos. Finalmente, el zinc total se encuentra en 81.44 miligramos, cubriendo ampliamente los requerimientos diarios.
-
-La diversidad de alimentos seleccionados y el cumplimiento de los límites nutricionales establecidos reflejan el éxito del modelo en generar una dieta balanceada y saludable.
+El modelo ha logrado ajustar la ingesta total de calorías a menos de 2500 KCAL y un peso total menor de 3000 G, respetando los límites establecidos. lo que demuestra la eficacia del solver en cumplir las restricciones impuestas. La diversidad de alimentos seleccionados y el cumplimiento de los límites nutricionales establecidos reflejan el éxito del modelo en generar una dieta balanceada y saludable.
 """
 
 # ╔═╡ c8fac9d9-db20-4a04-b246-5e185123c149
@@ -1572,8 +1594,9 @@ version = "17.4.0+2"
 # ╟─8b7b550b-9879-401c-9122-068ac0cc5272
 # ╠═7ac46500-67d3-4950-a324-8ea575640d37
 # ╟─7a521c99-7bcf-4bf4-8401-67de03e98567
+# ╟─48312602-1d87-4c96-ab2a-beb6fece3112
+# ╟─198e341d-92fe-48c7-83ad-558e72342d1b
 # ╠═7faa148d-ebf1-4cd0-8ad5-52ff8a50d6c7
-# ╠═8806f2c2-3481-4402-9395-04ad31818226
 # ╟─ac388665-512c-4532-84e6-4a63996927da
 # ╟─d4c87336-138a-497f-9c91-e7cc13621782
 # ╠═aafda15f-848f-42d5-8981-635292edb90b
@@ -1581,7 +1604,7 @@ version = "17.4.0+2"
 # ╟─3638c32e-1c63-4c68-ad1e-3d5be01f785f
 # ╟─14e79d76-296e-4fde-86ed-66fbfdbbbc0d
 # ╟─3b3651d3-927b-458f-8ab4-a2bfd0f866be
-# ╟─c25a02f9-01ae-47b1-b8df-b808aba58207
+# ╟─a2f6a807-a9b0-4b8d-9bf8-d379fc528c45
 # ╟─c8fac9d9-db20-4a04-b246-5e185123c149
 # ╟─50cfeca9-a617-424a-b2ea-44fcd538d918
 # ╟─9fa50681-6b96-4cc2-bb84-a1aba8abeb8a
